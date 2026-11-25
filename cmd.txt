@@ -1,0 +1,4 @@
+Invoke-WebRequest https://download.sysinternals.com/files/Sysmon.zip -OutFile $HOME\Sysmon.zip
+Expand-Archive $HOME\Sysmon.zip -DestinationPath C:\Sysmon -Force
+Invoke-WebRequest https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml -OutFile C:\Sysmon\config.xml
+C:\Sysmon\Sysmon64.exe -accepteula -i C:\Sysmon\config.xml
