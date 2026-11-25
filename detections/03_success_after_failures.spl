@@ -1,0 +1,8 @@
+# Detection 03 - Successful logon after repeated failures (possible compromised account) | MITRE T1078 after T1110
+# Alert: every 10 min, last 30 min, severity HIGH
+index=wineventlog (EventCode=4625 OR EventCode=4624) earliest=-30m
+| eval outcome=if(EventCode=4625,"fail","success")
+| eval fail_time=if(outcome="fail",_time,null()), success_time=if(outcome="success",_time,null())
+| stats count(eval(outcome="fail")) AS fails count(eval(outcome="success")) AS successes max(fail_time) AS last_fail max(success_time) AS last_success BY TargetUserName IpAddress Computer
+| where fails>=5 AND successes>=1 AND last_success>last_fail
+| eval last_fail=strftime(last_fail,"%F %T"), last_success=strftime(last_success,"%F %T")

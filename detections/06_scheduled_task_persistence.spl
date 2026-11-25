@@ -1,0 +1,6 @@
+# Detection 06 - Persistence via scheduled task creation | MITRE T1053.005
+# Needs: Sysmon Event ID 1
+# Alert: every 5 min, last 10 min, trigger if results > 0
+index=sysmon EventCode=1 Image="*\\schtasks.exe" CommandLine="*/create*"
+| table _time Computer User ParentImage CommandLine
+| sort - _time

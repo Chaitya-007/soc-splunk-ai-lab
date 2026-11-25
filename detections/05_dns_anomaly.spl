@@ -1,0 +1,12 @@
+# Detection 05 - DNS anomaly (many unique long subdomains under one parent domain: tunnelling/DGA-like) | MITRE T1071.004, T1568.002
+# Needs: Sysmon Event ID 22 (DNSQuery)
+# Alert: every 5 min, last 10 min, trigger if results > 0
+# Optional: add entropy with the URL Toolbox app (ut_shannon) to cut false positives
+index=sysmon EventCode=22
+| eval parts=split(QueryName,".")
+| eval parent=mvindex(parts,-2).".".mvindex(parts,-1)
+| eval qlen=len(QueryName)
+| bin _time span=5m
+| stats count AS queries dc(QueryName) AS unique_names avg(qlen) AS avg_len max(qlen) AS max_len BY _time Computer parent
+| where unique_names>=50 OR max_len>=60
+| sort - unique_names

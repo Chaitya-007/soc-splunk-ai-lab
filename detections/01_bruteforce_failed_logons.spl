@@ -1,0 +1,8 @@
+# Detection 01 - Brute force (many failed logons from one source)  | MITRE T1110.001
+# Alert: scheduled every 5 min, time range last 10 min, trigger if results > 0, throttle 15 min by IpAddress
+# NOTE: field names depend on your Splunk Add-on for Microsoft Windows version. Check with: | fieldsummary
+index=wineventlog EventCode=4625
+| bin _time span=5m
+| stats count AS failures dc(TargetUserName) AS distinct_users values(TargetUserName) AS targeted_users values(LogonType) AS logon_types BY _time IpAddress Computer
+| where failures>=10
+| sort - failures
